@@ -96,14 +96,18 @@ vicious.register(datewidget, vicious.widgets.date, " %a %b %d, %r ")
 -- {{{ Network usage
 dnicon = widget({ type = "imagebox" })
 upicon = widget({ type = "imagebox" })
-dnicon.image = image("/home/hnguyen/.config/awesome/download.png")
-upicon.image = image("/home/hnguyen/.config/awesome/upload.png")
+dnicon.image = image(awful.util.getdir("config") .. "/download.png")
+upicon.image = image(awful.util.getdir("config") .. "/upload.png")
 -- Initialize widget
 wlanlabel = widget({ type = "textbox" })
-wlanlabel.text = "wlan0: "
+ethlabel = widget({ type = "textbox" })
+ethlabel.text = "eth0: "
+wlanlabel.text = "  wlan0: "
 netwidget = widget({ type = "textbox" })
+ethwidget = widget({ type = "textbox" })
 -- Register widget
 vicious.register(netwidget, vicious.widgets.net, '<span color="#c3e166">${wlan0 down_kb}</span>  <span color="#72cde5">${wlan0 up_kb}</span>', 3)
+vicious.register(ethwidget, vicious.widgets.net, '<span color="#c3e166">${eth0 down_kb}</span> <span color="#72cde5">${eth0 up_kb}</span>', 3)
 -- }}}
 
 -- Create a wibox for each screen and add it
@@ -177,11 +181,15 @@ for s = 1, screen.count() do
         mylayoutbox[s],
         -- mytextclock,
         datewidget,
-        s == 2 and mysystray or nil,
-        s == 2 and upicon or nil,
-        s == 2 and netwidget or nil,
-        s == 2 and dnicon or nil,
-        s == 2 and wlanlabel or nil,
+        s == 1 and mysystray or nil,
+        s == 1 and upicon or nil,
+        s == 1 and netwidget or nil,
+        s == 1 and dnicon or nil,
+        s == 1 and wlanlabel or nil,
+        s == 1 and upicon or nil,
+        s == 1 and ethwidget or nil,
+        s == 1 and dnicon or nil,
+        s == 1 and ethlabel or nil,
         mytasklist[s],
         layout = awful.widget.layout.horizontal.rightleft
     }
@@ -241,7 +249,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey, "Control" }, "l",     function () awful.tag.incncol(-1)         end),
     awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
     awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
-    awful.key({}, "#148", function() awful.util.spawn_with_shell("dbus-send --system --print-reply --dest=org.freedesktop.Hal     /org/freedesktop/Hal/devices/computer     org.freedesktop.Hal.Device.SystemPowerManagement.Suspend int32:0") end),
+
     -- Prompt
     awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
 
@@ -317,8 +325,6 @@ clientbuttons = awful.util.table.join(
 root.keys(globalkeys)
 -- }}}
 
--- use xprop to find window info
---
 -- {{{ Rules
 awful.rules.rules = {
     -- All clients will match this rule.
@@ -333,23 +339,23 @@ awful.rules.rules = {
       properties = { floating = true } },
     { rule = { class = "pinentry" },
       properties = { floating = true } },
-    { rule = { class = "nautilus"},
-      callback = awful.titlebar.add,
+    { rule = { instance = "nautilus"},
+      callback = awful.placement.center,
       properties = { floating = true } },
-    { rule = { class = "Vlc" }, 
+    { rule = { instance = "vlc" }, 
       callback = awful.titlebar.add,
-      properties = { floating = true } },
-    { rule = { class = "guake.pl" },
       properties = { floating = true } },
     { rule = { instance = "update-manager" }, 
       callback = awful.titlebar.add,
       properties = { floating = true } },
     { rule = { instance = "rdesktop" }, 
       callback = awful.titlebar.add,
-      properties = { floating = true } }, 
-    { rule = { class = "Banshee" },
       properties = { floating = true } },
-    
+    { rule = { class = "OpenOffice.org 3.2"},
+      callback = awful.titlebar.add,
+      properties = { floating = true } }
+
+
         -- Set Firefox to always map on tags number 2 of screen 1.
     -- { rule = { class = "Firefox" },
     --   properties = { tag = tags[1][2] } },
@@ -387,39 +393,26 @@ client.add_signal("focus", function(c) c.border_color = beautiful.border_focus e
 client.add_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
 --
-function run_once(prg,arg_string,screen)
+function run_once(prg,arg_string,pname,screen)
     if not prg then
         do return nil end
     end
+
+    if not pname then
+       pname = prg
+    end
+
     if not arg_string then 
-        awful.util.spawn_with_shell("pgrep -f -u $USER -x " .. prg .. " || (" .. prg .. ")",screen)
+        awful.util.spawn_with_shell("pgrep -f -u $USER -x '" .. pname .. "' || (" .. prg .. ")",screen)
     else
-        awful.util.spawn_with_shell("pgrep -f -u $USER -x " .. prg .. " || (" .. prg .. " " .. arg_string .. ")",screen)
+        awful.util.spawn_with_shell("pgrep -f -u $USER -x '" .. pname .. "' || (" .. prg .. " " .. arg_string .. ")",screen)
     end
 end
 
-function run_once(prg,arg_string,pname,screen)
-  if not prg then
-    do return nil end
-  end
-
-  if not pname then
-    pname = prg
-  end
-
-  if not arg_string then 
-    awful.util.spawn_with_shell("pgrep -f -u $USER -x '" .. pname .. "' || (" .. prg .. ")",screen)
-  else
-    awful.util.spawn_with_shell("pgrep -f -u $USER -x '" .. pname .. "' || (" .. prg .. " " .. arg_string .. ")",screen)
-  end
-end
-
+run_once("xscreensaver", "-no-splash")
+run_once("nm-applet", "--sm_disable")
 run_once("gnome-power-manager")
-run_once("gnome-volume-control-applet")
-run_once("gnome-settings-daemon")
-run_once("nm-applet")
-run_once("update-notifier")
-run_once("dropbox","start -i", "/home/hnguyen/.dropbox-dist/dropbox")
-run_once("gnome-do", "--quiet", "/bin/sh /usr/bin/gnome-do --quiet")
+-- run_once("update-notifier")
+-- run_once("dropbox","start -i")
+run_once("kupfer","--no-splash","/usr/bin/python /usr/share/kupfer/kupfer.py")
 run_once("guake", nil, "guake -OO /usr/lib/guake/guake.py")
---run_once("wicd-client", nil, "/usr/bin/python -O /usr/share/wicd/gtk/wicd-client.py")
