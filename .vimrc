@@ -28,11 +28,18 @@ set dir=~/tmp,/var/tmp,/tmp
 set encoding=utf-8
 set nocompatible
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.scssc,*.sassc
+set fillchars+=vert:\ 
 color desert
 
 map <F2> :NERDTreeToggle<CR>
 map <F3> <plug>NERDCommenterToggle<CR>
 map <F5> :!ctags --extra=+f --exclude=.git --exclude=public --exclude=log -R * `rvm gemdir`/gems/*<CR><CR>
+
+" Hard mode, stop using arrow keys damn it!
+noremap <Up> <NOP>
+noremap <Down> <NOP>
+noremap <Left> <NOP>
+noremap <Right> <NOP>
 
 " Escape special characters in a string for exact matching.
 " This is useful to copying strings from the file to the search tool
@@ -109,7 +116,8 @@ let w:m2=matchadd('ErrorMsg', '\%>79v.\+', -1)
 au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>79v.\+', -1)
 
 au! BufNewFile,BufRead Gemfile,Guardfile set filetype=ruby
-"if has("statusline") && !&cp
+au BufNewFile,BufRead *.go set filetype=go
+if has("statusline") && !&cp
   set laststatus=2  " always show the status bar
 
   "" Without setting this, ZoomWin restores windows in a way that causes
@@ -118,10 +126,10 @@ au! BufNewFile,BufRead Gemfile,Guardfile set filetype=ruby
   "set noequalalways
 
   "" Start the status line
-  "set statusline=%f\ %m\ %r
+  set statusline=%f\ %m\ %r
 
   "" Add fugitive if enabled
-  "set statusline+=%{fugitive#statusline()}
+  set statusline+=%{fugitive#statusline()}
 
   "" Add syntastic if enabled
   let g:syntastic_enable_signs=1
@@ -130,11 +138,11 @@ au! BufNewFile,BufRead Gemfile,Guardfile set filetype=ruby
   set statusline+=%*
 
   "" Finish the statusline
-  "set statusline+=Line:%l/%L[%p%%]
-  "set statusline+=Col:%v
-  "set statusline+=Buf:#%n
-  "set statusline+=[%b][0x%B]
-"endif
+  set statusline+=Line:%l/%L[%p%%]
+  set statusline+=Col:%v
+  set statusline+=Buf:#%n
+  set statusline+=[%b][0x%B]
+endif
 
 " Vim functions to run RSpec and Cucumber on the current file and optionally on
 " the spec/scenario under the cursor.
@@ -168,9 +176,11 @@ map <Leader>' :call RunTestFile("")<CR>
 set list listchars=tab:\ \ ,trail:⋅
 
 map <leader>t :CtrlP<CR>
+let g:ctrlp_cmd = 'CtrlPMixed'
+let g:ctrlp_working_path_mode = 'ra'
 
 " vundle
-filetype off
+  
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
 Bundle 'gmarik/vundle'
@@ -193,8 +203,11 @@ Bundle 'tpope/vim-markdown'
 Bundle 'timcharper/textile.vim'
 Bundle 'nelstrom/vim-markdown-preview'
 Bundle 'EasyGrep'
-Bundle 'Syntastic'
+Bundle 'scrooloose/syntastic'
 Bundle 'Lokaltog/vim-powerline.git'
+Bundle 'tpope/vim-surround'
+Bundle 'go.vim'
+Bundle 'Valloric/YouCompleteMe'
 
 filetype plugin indent on
 hi CursorLine   cterm=NONE ctermbg=235 guibg=darkred
