@@ -117,6 +117,8 @@ au BufWinEnter * let w:m2=matchadd('ErrorMsg', '\%>79v.\+', -1)
 
 au! BufNewFile,BufRead Gemfile,Guardfile set filetype=ruby
 au BufNewFile,BufRead *.go set filetype=go
+let ruby_fold = 1
+
 if has("statusline") && !&cp
   set laststatus=2  " always show the status bar
 
@@ -176,11 +178,30 @@ map <Leader>' :call RunTestFile("")<CR>
 set list listchars=tab:\ \ ,trail:⋅
 
 map <leader>t :CtrlP<CR>
-let g:ctrlp_cmd = 'CtrlPMixed'
+let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_working_path_mode = 'ra'
 
+" selecta
+" Run a given vim command on the results of fuzzy selecting from a given shell
+" command. See usage below.
+function! SelectaCommand(choice_command, selecta_args, vim_command)
+  try
+    silent let selection = system(a:choice_command . " | selecta " . a:selecta_args)
+  catch /Vim:Interrupt/
+    " Swallow the ^C so that the redraw below happens; otherwise there will be
+    " leftovers from selecta on the screen
+    redraw!
+    return
+  endtry
+  redraw!
+  exec a:vim_command . " " . selection
+endfunction
+
+" Find all files in all non-dot directories starting in the working directory.
+" Fuzzy select one of those. Open the selected file with :e.
+nnoremap <leader>f :call SelectaCommand("find * -type f", "", ":e")<cr>
+
 " vundle
-  
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
 Bundle 'gmarik/vundle'
@@ -208,6 +229,7 @@ Bundle 'Lokaltog/vim-powerline.git'
 Bundle 'tpope/vim-surround'
 Bundle 'go.vim'
 Bundle 'Valloric/YouCompleteMe'
+Bundle 'nono/vim-handlebars'
 
 filetype plugin indent on
 hi CursorLine   cterm=NONE ctermbg=235 guibg=darkred
