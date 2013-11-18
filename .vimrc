@@ -8,7 +8,7 @@ set ml
 set nu
 set ic
 set is
-set fdm=syntax
+set fdm=marker
 set hlsearch
 set nofoldenable
 set mouse=a
@@ -31,15 +31,36 @@ set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.scssc,*.sassc
 set fillchars+=vert:\ 
 color desert
 
+set shell=zsh\ --login
+
 map <F2> :NERDTreeToggle<CR>
 map <F3> <plug>NERDCommenterToggle<CR>
-map <F5> :!ctags --extra=+f --exclude=.git --exclude=public --exclude=log -R * `rvm gemdir`/gems/*<CR><CR>
+map <F5> :!ctags --fields=+l --extra=+f --exclude=.git --exclude=public --exclude=log -R * `rvm gemdir`/gems/*<CR><CR>
 
 " Hard mode, stop using arrow keys damn it!
 noremap <Up> <NOP>
 noremap <Down> <NOP>
 noremap <Left> <NOP>
 noremap <Right> <NOP>
+
+" Use CMD+Arrow to move around splits
+nmap <silent> <Up> :wincmd k<CR>
+nmap <silent> <Down> :wincmd j<CR>
+nmap <silent> <Left> :wincmd h<CR>
+nmap <silent> <Right> :wincmd l<CR>
+
+"ruby
+autocmd FileType ruby,eruby set omnifunc=rubycomplete#Complete
+autocmd FileType ruby,eruby let g:rubycomplete_buffer_loading = 1
+autocmd FileType ruby,eruby let g:rubycomplete_rails = 1
+autocmd FileType ruby,eruby let g:rubycomplete_classes_in_global = 1
+
+let g:ycm_filetype_specific_completion_to_disable = {'ruby': 1}
+
+" SAY NO TO TRAILING WHITESPACE!
+function! WhiteSpace()
+  exe :%s/\s\+$//
+endfunction
 
 " Escape special characters in a string for exact matching.
 " This is useful to copying strings from the file to the search tool
@@ -82,7 +103,7 @@ vmap <leader>r <Esc>:%s/<c-r>=GetVisual()<cr>/
 
 " Window Swapping
 function! MarkWindowSwap()
-    let g:markedWinNum = winnr()
+   let g:markedWinNum = winnr()
 endfunction
 
 function! DoWindowSwap()
@@ -173,6 +194,7 @@ function! RunTest(args)
   call RunSpec("-l " . line('.') . a:args)
 endfunction
 
+map <Leader><Delete> :call WhiteSpace()<CR>
 map <Leader>; :call RunTest("")<CR>
 map <Leader>' :call RunTestFile("")<CR> 
 set list listchars=tab:\ \ ,trail:⋅
@@ -233,3 +255,4 @@ Bundle 'nono/vim-handlebars'
 
 filetype plugin indent on
 hi CursorLine   cterm=NONE ctermbg=235 guibg=darkred
+let g:ackprg = 'ag --nogroup --nocolor --column'
