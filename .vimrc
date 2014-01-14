@@ -228,6 +228,7 @@ set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
 Bundle 'gmarik/vundle'
 
+Bundle 'elixir-lang/vim-elixir'
 Bundle 'The-NERD-tree'
 Bundle 'tpope/vim-rails.git'
 Bundle 'fugitive.vim'
@@ -252,7 +253,10 @@ Bundle 'tpope/vim-surround'
 Bundle 'go.vim'
 Bundle 'Valloric/YouCompleteMe'
 Bundle 'nono/vim-handlebars'
+Bundle 'skalnik/vim-vroom'
+Bundle 'tpope/vim-bundler'
 
+filetype off
 filetype plugin indent on
 hi CursorLine   cterm=NONE ctermbg=235 guibg=darkred
 let g:ackprg = 'ag --nogroup --nocolor --column'
