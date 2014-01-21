@@ -235,7 +235,7 @@ Bundle 'fugitive.vim'
 Bundle 'endwise.vim'
 Bundle 'Tabular'
 Bundle 'matchit.zip'
-Bundle 'ack.vim'
+Bundle 'rking/ag.vim'
 Bundle 'kien/ctrlp.vim.git'
 Bundle 'kchmck/vim-coffee-script.git'
 Bundle 'vesan/scss-syntax.vim.git'
@@ -260,4 +260,3 @@ Bundle 'elixir-lang/vim-elixir'
 filetype off
 filetype plugin indent on
 hi CursorLine   cterm=NONE ctermbg=235 guibg=darkred
-let g:ackprg = 'ag --nogroup --nocolor --column'
