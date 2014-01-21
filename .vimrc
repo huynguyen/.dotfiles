@@ -255,6 +255,7 @@ Bundle 'Valloric/YouCompleteMe'
 Bundle 'nono/vim-handlebars'
 Bundle 'skalnik/vim-vroom'
 Bundle 'tpope/vim-bundler'
+Bundle 'elixir-lang/vim-elixir'
 
 filetype off
 filetype plugin indent on
